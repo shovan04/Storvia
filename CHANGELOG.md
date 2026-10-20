@@ -3322,3 +3322,68 @@ console's own title, and the cross-origin HMR warning is gone.
   lint result is claimed.
 - The console still has never been used by a person. Nothing here changes that.
 - No commit was created.
+
+---
+
+## 2026-10-16 — Stored files are inside Drive's Storvia folder; the user was looking under My Drive
+
+### Answered: "WhatsApp backup files don't show in Drive — are Storvia's files hidden too?"
+
+**No — the files are in Drive, inside a "Storvia" folder.** The operator's files weren't hidden by Storvia; they were in a section of Drive they weren't looking in. Verified against the real connected account with a read-only probe (`internal/app/live_where_files_live_test.go`, opt-in via `STORVIA_LIVE_DRIVE_TEST=1`):
+
+- The "Storvia" folder exists: name="Storvia", trashed=false, at `https://drive.google.com/drive/folders/1R5CuK1CDTr2XKFcyy2xsXmpNVsot6W1i`
+- Both `ready` stored files live inside that folder:
+  - `Confident Portrait with Teal Rim Light (1).png` — `1IS3V5vtRaV66CLT3hwUNzgSYi9A2dPqC` — not trashed
+  - `Storvia Cloud Storage Logo.png` — `1DMYfi9BROFvc41p9Wdka068wElZK_sKf` — not trashed
+- Every `deleted`-status object returns 404 from Drive — they were genuinely removed.
+
+### Why they weren't visible
+
+The Storvia folder's parent id is `0AInOpg_vMFZhUk9PVA` — non-empty, so it is **not at the My Drive root**. IDs starting with `0A` indicate a shared drive, so the folder is likely nested inside a **Shared Drive**, which Drive's web/app lists under "Shared drives" (sidebar) rather than under "My Drive". The user was looking under "My Drive" and concluded the files weren't there.
+
+### Code finding: a deadlock in my own probe
+
+The first run of this diagnostic hung for 90s. `sqlite` is opened with `MaxOpenConns=1`, and I held an open SQL rows cursor across a `FetchFile` call that itself queries the same single-connection pool — a self-deadlock. Fixed by draining the rows into memory and closing the cursor before any Drive call. That's a real hazard worth documenting: an open rows cursor blocks every other query on a single-connection SQLite pool.
+
+### Files.go change
+
+`drive.FetchFile` now also returns `DriveID` (the shared drive id, empty for My Drive), fetched from Drive's `driveId` field. This makes shared-drive placement detectable rather than guessed from an id prefix. `TestLiveWhereDoTheFilesActuallyLive` exercises it.
+
+### Verified
+
+`go build ./...`, `make check-all` (drive + app packages), `make sdk-ts-check`, and the console typecheck are all clean.
+
+### Not done
+
+- The shared-drive hypothesis (`0A...` prefix) is strong but not yet proven — I haven't fetched that parent id to confirm it's a shared drive versus a regular nested My Drive folder.
+- No commit was created.
+
+---
+
+## 2026-10-16 — Hidden Drive storage via appDataFolder
+
+### The problem
+
+Stored files live in a visible "Storvia" folder in the user's Google Drive. Anyone with access to the Drive account can see them in Drive web and mobile. For use cases like WhatsApp-style backups, that is the wrong default: the user should not be able to browse, move, or delete Storvia's files from the Drive app.
+
+### The feature
+
+**Hidden storage via Drive's `appDataFolder`.** `appDataFolder` is a special Drive folder visible only to the creating app — it never appears in My Drive, shared drives, or any folder listing in Drive web or mobile. Storvia can still read, download, and delete these files, but the user cannot see them in Drive.
+
+### How it works
+
+- **New config flag** `drive.store_in_app_data_folder` (default `false`, preserving current behavior).
+- **New scope** `https://www.googleapis.com/auth/drive.appdata` — required to write to `appDataFolder`. Added alongside the existing `drive.file` scope; both are narrow (the full `drive` scope is still rejected).
+- **Uploads** use `appDataFolder` as the parent instead of a visible folder ID. No "Storvia" folder is created.
+- **Downloads and deletes** work normally — `FetchFile` and `DeleteFile` use the file id, which is independent of where the file lives.
+- **Console**: the Drive panel shows "Hidden storage (appDataFolder) — not visible in Drive web/app", and the Stored objects table shows a hint explaining that files are hidden. Each file gets a "View in Drive" link (constructed from the Drive file id as `https://drive.google.com/file/d/{id}/view`) — note that this link will show "file not found" if the user opens it while logged in as themselves, because the file is not visible to them.
+- **No folder creation**: `EnsureFolder` is a no-op in hidden mode since `appDataFolder` is implicit.
+
+### Verified
+
+`make check` passes (fmt, vet, test). Console typecheck clean. Config validation accepts `drive.file` and `drive.appdata`, rejects everything else.
+
+### Not done
+
+- Existing connections need to re-consent: `drive.appdata` is a new scope, so users must sign in again before hidden mode works. The OAuth flow handles this naturally (Google shows the consent screen for the new scope).
+- No commit was created.

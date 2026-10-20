@@ -55,11 +55,15 @@ function messageOf(error: unknown): string {
 export function ObjectTable({
   objects,
   onChanged,
+  usesAppDataFolder,
 }: {
   objects: ObjectView[];
   /** Re-reads the console state. Reloading the page instead would lose the scroll
    *  position and any open panel, for a change that only touches this table. */
   onChanged?: () => void | Promise<void>;
+  /** True when files are stored in Drive's hidden appDataFolder. Files there are
+   *  invisible to the user in Drive web and mobile. */
+  usesAppDataFolder?: boolean;
 }) {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -135,6 +139,12 @@ export function ObjectTable({
     }
   }
 
+  /** Drive web link for a stored file. provider_ref is the Drive file id. */
+  function driveFileUrl(object: ObjectView): string {
+    if (!object.provider_ref) return '';
+    return `https://drive.google.com/file/d/${object.provider_ref}/view`;
+  }
+
   const summary = [
     `${counts.stored} stored`,
     counts.working > 0 ? `${counts.working} in progress` : null,
@@ -154,7 +164,11 @@ export function ObjectTable({
           'Stored objects'
         )
       }
-      hint="Files held on your behalf. Each row is one file; deleting removes it from the provider that holds it, not just from this list."
+      hint={
+        usesAppDataFolder
+          ? 'Files are stored in Drive’s hidden appDataFolder — not visible in Drive web or mobile. Storvia can still read and delete them.'
+          : 'Files are stored in a “Storvia” folder in your Drive. Each row is one file; deleting removes it from the provider that holds it, not just from this list.'
+      }
       action={
         objects.length > 0 ? (
           <button className="danger btn-sm" disabled={clearing} onClick={() => void removeAll()}>
@@ -190,6 +204,7 @@ export function ObjectTable({
               const status = statusOf(object.status);
               const reference = referenceOf(object);
               const busy = busyId === object.id || clearing;
+              const driveUrl = driveFileUrl(object);
               return (
                 <tr key={object.id} title={`Object id: ${object.id}`}>
                   <td>
@@ -219,6 +234,11 @@ export function ObjectTable({
                     {object.downloadable ? (
                       <a className="mono" href={downloadUrl(object.id)}>
                         Download
+                      </a>
+                    ) : null}
+                    {driveUrl ? (
+                      <a className="mono" href={driveUrl} target="_blank" rel="noopener noreferrer">
+                        View in Drive
                       </a>
                     ) : null}
                     <button

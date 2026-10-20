@@ -144,9 +144,15 @@ func (c *Console) SignOut(w http.ResponseWriter, r *http.Request) {
 }
 
 // EnsureFolder creates the app-managed Storvia/ folder if it is absent.
+//
+// In app-data mode there is no visible folder to create: appDataFolder is implicit.
 func (c *Console) EnsureFolder(w http.ResponseWriter, r *http.Request) {
 	scope, ok := c.requireSession(w, r)
 	if !ok {
+		return
+	}
+	if c.driveUsesAppDataFolder() {
+		c.writeJSON(w, http.StatusOK, map[string]bool{"created": false, "app_data_folder": true})
 		return
 	}
 	if c.folders == nil {

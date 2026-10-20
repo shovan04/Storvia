@@ -224,6 +224,9 @@ type Connection struct {
 	FolderPresent bool       `json:"folder_present"`
 	Stale         bool       `json:"stale"`
 	LastSuccessAt *time.Time `json:"last_success_at,omitempty"`
+	// UsesAppDataFolder reports whether files are stored in Drive's hidden
+	// appDataFolder rather than a visible folder in My Drive.
+	UsesAppDataFolder bool `json:"uses_app_data_folder"`
 }
 
 // StorageInfo is whether this account can upload right now, and where.
@@ -311,13 +314,14 @@ func (c *Console) State(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	state.Connection = Connection{
-		Connected:     connection.Connected,
-		Status:        connection.Status,
-		Subject:       connection.Subject,
-		GrantedScopes: strings.Join(connection.GrantedScopes, " "),
-		FolderPresent: connection.FolderPresent,
-		LastSuccessAt: connection.LastSuccessAt,
-		Stale:         connection.Stale,
+		Connected:         connection.Connected,
+		Status:            connection.Status,
+		Subject:           connection.Subject,
+		GrantedScopes:     strings.Join(connection.GrantedScopes, " "),
+		FolderPresent:     connection.FolderPresent,
+		UsesAppDataFolder: connection.UsesAppDataFolder,
+		LastSuccessAt:     connection.LastSuccessAt,
+		Stale:             connection.Stale,
 	}
 	state.Account.Subject = connection.Subject
 	state.Account.DisplayName = connection.DisplayName
@@ -552,6 +556,12 @@ func (c *Console) DeleteAllObjects(w http.ResponseWriter, r *http.Request) {
 		"deleted": result.Deleted,
 		"failed":  result.Failed,
 	})
+}
+
+// driveUsesAppDataFolder reports whether files are stored in Drive's hidden
+// appDataFolder rather than a visible folder in My Drive.
+func (c *Console) driveUsesAppDataFolder() bool {
+	return c.connects.UsesAppDataFolder()
 }
 
 // DownloadContent streams an object's bytes, for checking that what was uploaded is

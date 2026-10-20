@@ -257,17 +257,20 @@ func (u UploadsConfig) EffectiveMaxSize(category string) int64 {
 // DriveConfig holds Google OAuth settings and the availability routing budget.
 //
 // Every secret is an environment reference. The narrow drive.file scope is the
-// only scope the MVP requests.
+// only scope the MVP requests. When StoreInAppDataFolder is true, files are
+// stored in Drive's appDataFolder and are invisible to the user in Drive web
+// and mobile; this requires the drive.appdata scope.
 type DriveConfig struct {
-	RedirectURI       string   `json:"redirect_uri"`
-	AdminRedirectURI  string   `json:"admin_redirect_uri"`
-	Scopes            []string `json:"scopes"`
-	RootFolderName    string   `json:"root_folder_name"`
-	PreflightTimeout  Duration `json:"preflight_timeout"`
-	PreflightAttempts int      `json:"preflight_attempts"`
-	RoutingBudget     Duration `json:"routing_budget"`
-	CircuitFailures   int      `json:"circuit_failures"`
-	CircuitCooldown   Duration `json:"circuit_cooldown"`
+	RedirectURI          string   `json:"redirect_uri"`
+	AdminRedirectURI     string   `json:"admin_redirect_uri"`
+	Scopes               []string `json:"scopes"`
+	RootFolderName       string   `json:"root_folder_name"`
+	StoreInAppDataFolder bool     `json:"store_in_app_data_folder"`
+	PreflightTimeout     Duration `json:"preflight_timeout"`
+	PreflightAttempts    int      `json:"preflight_attempts"`
+	RoutingBudget        Duration `json:"routing_budget"`
+	CircuitFailures      int      `json:"circuit_failures"`
+	CircuitCooldown      Duration `json:"circuit_cooldown"`
 }
 
 // WorkerConfig tunes the background job runner.
@@ -697,11 +700,13 @@ func (c *Config) validateCache() error {
 }
 
 func (c *Config) validateDrive() error {
-	// The narrow per-file scope is the MVP contract. A broader scope in a
-	// config file is a stop-the-line error, not a warning.
+	// The narrow per-file scope and the app-data scope are the only scopes this
+	// release requests. A broader scope in a config file is a stop-the-line
+	// error, not a warning.
 	for _, scope := range c.Drive.Scopes {
-		if scope != "https://www.googleapis.com/auth/drive.file" {
-			return fmt.Errorf("config: drive.scopes may only contain the drive.file scope in this release, got %q", scope)
+		if scope != "https://www.googleapis.com/auth/drive.file" &&
+			scope != "https://www.googleapis.com/auth/drive.appdata" {
+			return fmt.Errorf("config: drive.scopes may only contain drive.file and drive.appdata scopes in this release, got %q", scope)
 		}
 	}
 	if c.Drive.PreflightAttempts < 1 {

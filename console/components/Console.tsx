@@ -61,7 +61,7 @@ export function Console({ initial, reload }: { initial: State; reload: () => Pro
 
         <OperatorControls state={state} onChanged={() => void refresh()} />
 
-        <ObjectTable objects={state.objects} onChanged={() => void refresh()} />
+        <ObjectTable objects={state.objects} onChanged={() => void refresh()} usesAppDataFolder={state.connection.uses_app_data_folder} />
 
         {state.diagnostics && Object.keys(state.diagnostics).length > 0 ? (
           <Card title="Diagnostics">

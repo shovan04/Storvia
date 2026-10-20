@@ -37,22 +37,26 @@ export function DrivePanel({ connection, onChanged }: Props) {
           <div className="row">
             <Pill tone="on">Connected</Pill>
             <span className="muted">
-              {connection.folder_present
-                ? 'Storvia/ folder present'
-                : 'Storvia/ folder missing'}
+              {connection.uses_app_data_folder
+                ? 'Hidden storage (appDataFolder) — not visible in Drive web/app'
+                : connection.folder_present
+                  ? 'Storvia/ folder present'
+                  : 'Storvia/ folder missing'}
               {connection.subject ? ` · ${connection.subject}` : ''}
               {connection.granted_scopes ? ` · ${connection.granted_scopes}` : ''}
             </span>
             <span style={{ flex: 1 }} />
-            <button
-              className="ghost"
-              disabled={busy}
-              onClick={() =>
-                run(() => api.ensureFolder().then(() => undefined), 'The Storvia/ folder is present in Drive.')
-              }
-            >
-              Create Storvia/ folder
-            </button>
+            {!connection.uses_app_data_folder && (
+              <button
+                className="ghost"
+                disabled={busy}
+                onClick={() =>
+                  run(() => api.ensureFolder().then(() => undefined), 'The Storvia/ folder is present in Drive.')
+                }
+              >
+                Create Storvia/ folder
+              </button>
+            )}
             <button
               className="danger"
               disabled={busy}

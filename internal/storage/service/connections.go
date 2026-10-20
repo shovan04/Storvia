@@ -49,6 +49,9 @@ type ConnectionStatus struct {
 	FolderPresent bool
 	LastSuccessAt *time.Time
 	Stale         bool
+	// UsesAppDataFolder reports whether files are stored in Drive's hidden
+	// appDataFolder rather than a visible folder in My Drive.
+	UsesAppDataFolder bool
 	// Email, DisplayName and PictureURL identify the connected Google account so an
 	// operator can see who they are acting as.
 	//
@@ -81,6 +84,16 @@ func (s *ConnectionService) Status(ctx context.Context, scope persistence.Scope)
 // connection change.
 func (s *ConnectionService) Disconnect(ctx context.Context, scope persistence.Scope) error {
 	return s.connector.Disconnect(ctx, scope)
+}
+
+// UsesAppDataFolder reports whether files are stored in Drive's hidden appDataFolder
+// rather than a visible folder in My Drive.
+func (s *ConnectionService) UsesAppDataFolder() bool {
+	connector, ok := s.connector.(*DriveConnector)
+	if !ok {
+		return false
+	}
+	return connector.client.UsesAppDataFolder()
 }
 
 // BeginConnect starts the consent flow and returns the URL the browser must open.
@@ -274,7 +287,14 @@ func (d *DriveConnector) Status(ctx context.Context, scope persistence.Scope) (C
 		status.DisplayName = profile.DisplayName
 		status.PictureURL = profile.PictureURL
 	}
-	status.FolderPresent = raw.RootFolderID != ""
+	// In app-data mode there is no visible folder, but appDataFolder is always
+	// available, so the "folder present" flag is true.
+	if d.client.UsesAppDataFolder() {
+		status.FolderPresent = true
+		status.UsesAppDataFolder = true
+	} else {
+		status.FolderPresent = raw.RootFolderID != ""
+	}
 	status.LastSuccessAt = raw.LastSuccessAt
 	status.Stale = drive.Stale(raw.LastSuccessAt, time.Now())
 	status.Connected = raw.Status == drive.StatusConnected

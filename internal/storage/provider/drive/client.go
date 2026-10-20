@@ -37,6 +37,13 @@ import (
 // verification and security-assessment path. It is the one scope the MVP asks for.
 const ScopeDriveFile = "https://www.googleapis.com/auth/drive.file"
 
+// ScopeDriveAppData is the app-data scope.
+//
+// It lets Storvia store files in Drive's appDataFolder, which is visible only to
+// Storvia and not to the user in Drive web or mobile. Files stored there do not
+// appear in the user's My Drive, shared drives, or any folder listing.
+const ScopeDriveAppData = "https://www.googleapis.com/auth/drive.appdata"
+
 // Google OAuth and Drive endpoints. They are constants rather than configuration
 // because a client must not be able to redirect an authorization code to an
 // operator-chosen host.
@@ -87,10 +94,16 @@ var ErrNotConfigured = errors.New("drive: google oauth credentials are not confi
 // Config configures the Drive provider.
 type Config struct {
 	Credentials Credentials
-	// Scopes is validated to contain only ScopeDriveFile at config load time.
+	// Scopes is validated to contain only ScopeDriveFile and ScopeDriveAppData
+	// at config load time.
 	Scopes []string
 	// RootFolderName is the visible folder Storvia manages in My Drive.
+	// It is unused when StoreInAppDataFolder is true.
 	RootFolderName string
+	// StoreInAppDataFolder stores files in Drive's appDataFolder instead of a
+	// visible folder in My Drive. Files there are invisible to the user in Drive
+	// web and mobile, but Storvia can still read and delete them.
+	StoreInAppDataFolder bool
 	// PreflightTimeout bounds one read-only availability call.
 	PreflightTimeout time.Duration
 	// RefreshSkew is how long before expiry a token is proactively refreshed.
@@ -209,7 +222,7 @@ func New(ctx context.Context, cfg Config, deps ClientDeps) (*Client, error) {
 		cfg.Scopes = []string{ScopeDriveFile}
 	}
 	for _, scope := range cfg.Scopes {
-		if scope != ScopeDriveFile {
+		if scope != ScopeDriveFile && scope != ScopeDriveAppData {
 			return nil, fmt.Errorf("drive: scope %q is not permitted in this release", scope)
 		}
 	}
@@ -276,6 +289,10 @@ func (c *Client) RedirectURI() string { return c.cfg.Credentials.RedirectURI }
 // IsConfigured exposes the credential check to callers outside this package, so
 // the service layer can report a deployment gap without inspecting credentials.
 func (c *Client) IsConfigured() bool { return c.configured }
+
+// UsesAppDataFolder reports whether files are stored in Drive's hidden appDataFolder
+// rather than a visible folder in My Drive.
+func (c *Client) UsesAppDataFolder() bool { return c.cfg.StoreInAppDataFolder }
 
 // Name implements provider.Storage.
 func (c *Client) Name() string { return string(model.ProviderGoogleDrive) }

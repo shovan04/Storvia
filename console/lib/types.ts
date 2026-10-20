@@ -28,6 +28,10 @@ export type Connection = {
   folder_present: boolean;
   stale: boolean;
   last_success_at?: string;
+  /** True when files are stored in Drive's hidden appDataFolder instead of a
+   *  visible Storvia/ folder. Files there are invisible to the user in Drive
+   *  web and mobile. */
+  uses_app_data_folder: boolean;
 };
 
 export type ObjectView = {

@@ -42,6 +42,8 @@ type FileMetadata struct {
 	Trashed    bool
 	ParentID   string
 	WebViewURL string
+	// DriveID is the shared drive the file lives in. Empty for files in My Drive.
+	DriveID string
 }
 
 // InitiateUploadRequest describes the file a client wants to store.
@@ -101,6 +103,12 @@ func (c *Client) InitiateUpload(ctx context.Context, scope persistence.Scope, re
 
 	// Only name, parents, and mimeType are writable on a Drive file at create time.
 	//
+	// When storing in appDataFolder, the parent is the special "appDataFolder"
+	// ID, not a visible folder. Files there are invisible to the user in Drive.
+	parents := []string{connection.RootFolderID}
+	if c.cfg.StoreInAppDataFolder {
+		parents = []string{"appDataFolder"}
+	}
 	// `size` is deliberately NOT here. It looks like the way to declare a length, and
 	// the old comment claimed Drive required it, but `size` is a computed field on the
 	// file resource: sending it makes every initiation fail with
@@ -111,7 +119,7 @@ func (c *Client) InitiateUpload(ctx context.Context, scope persistence.Scope, re
 	// opinion of it.
 	metadata := map[string]any{
 		"name":     req.FileName,
-		"parents":  []string{connection.RootFolderID},
+		"parents":  parents,
 		"mimeType": req.MimeType,
 	}
 	body, err := json.Marshal(metadata)
@@ -200,7 +208,7 @@ func (c *Client) FetchFile(ctx context.Context, scope persistence.Scope, fileID 
 	}
 
 	endpoint := fmt.Sprintf("%s/%s?fields=%s&supportsAllDrives=true",
-		driveFilesURL, url.PathEscape(fileID), "id,name,mimeType,size,md5Checksum,trashed,parents,webViewLink")
+		driveFilesURL, url.PathEscape(fileID), "id,name,mimeType,size,md5Checksum,trashed,parents,driveId,webViewLink")
 	httpReq, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
 		return FileMetadata{}, &policy.ProviderError{
@@ -227,6 +235,7 @@ func (c *Client) FetchFile(ctx context.Context, scope persistence.Scope, fileID 
 		MD5         string   `json:"md5Checksum"`
 		Trashed     bool     `json:"trashed"`
 		Parents     []string `json:"parents"`
+		DriveID     string   `json:"driveId"`
 		WebViewLink string   `json:"webViewLink"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&payload); err != nil {
@@ -256,6 +265,7 @@ func (c *Client) FetchFile(ctx context.Context, scope persistence.Scope, fileID 
 		Trashed:    payload.Trashed,
 		ParentID:   parent,
 		WebViewURL: payload.WebViewLink,
+		DriveID:    payload.DriveID,
 	}, nil
 }
 
@@ -380,7 +390,9 @@ func (c *Client) usableConnection(ctx context.Context, scope persistence.Scope) 
 			SafeDetail: "the google drive connection is not usable; reconnect it",
 		}
 	}
-	if connection.RootFolderID == "" {
+	// In app-data mode there is no visible folder to create or track, so a missing
+	// RootFolderID is fine. appDataFolder is implicit and always available.
+	if !c.cfg.StoreInAppDataFolder && connection.RootFolderID == "" {
 		return Connection{}, &policy.ProviderError{
 			Provider: c.Name(), Operation: "DriveFile", Class: policy.ClassConfiguration,
 			SafeDetail: "the storvia drive folder is not known; reconnect the account",
