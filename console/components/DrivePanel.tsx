@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { api } from '@/lib/api';
+import { api, apiUrl } from '@/lib/api';
 import type { Connection } from '@/lib/types';
 import { Banner, Card, Pill } from './ui';
 
@@ -76,7 +76,7 @@ export function DrivePanel({ connection, onChanged }: Props) {
             <span className="muted">Uploads will use the fallback provider until Drive is connected.</span>
           </div>
           <div className="row" style={{ marginTop: 16 }}>
-            <a href="/console/sign-in">
+            <a href={apiUrl('/console/sign-in')}>
               <button>Connect Google Drive</button>
             </a>
           </div>

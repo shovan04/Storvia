@@ -3383,7 +3383,42 @@ Stored files live in a visible "Storvia" folder in the user's Google Drive. Anyo
 
 `make check` passes (fmt, vet, test). Console typecheck clean. Config validation accepts `drive.file` and `drive.appdata`, rejects everything else.
 
+### Config changes
+
+Both `config/config.development.json` and `config/config.production.json` now include:
+- `https://www.googleapis.com/auth/drive.appdata` in `drive.scopes`
+- `drive.store_in_app_data_folder: true`
+
 ### Not done
 
 - Existing connections need to re-consent: `drive.appdata` is a new scope, so users must sign in again before hidden mode works. The OAuth flow handles this naturally (Google shows the consent screen for the new scope).
 - No commit was created.
+
+---
+
+## 2026-10-16 — Fix: "Connect Google Drive" link after disconnect
+
+### The bug
+
+Clicking "Connect Google Drive" in the Drive panel after disconnecting led to a
+"Page not found" screen: "The console is a single page and this address is not part of
+it."
+
+The link was `<a href="/console/sign-in">`, a bare relative path. In development the
+console runs on `:3001` (Next.js) while the OAuth sign-in endpoint lives on `:8080`
+(Go). A bare `/console/sign-in` resolved against `:3001`, which has no such route —
+only Next.js's single-page fallback, which 404s any path other than `/`.
+
+### The fix
+
+Changed `console/components/DrivePanel.tsx` to use `apiUrl('/console/sign-in')`,
+matching what `console/components/SignInGate.tsx` already does. `apiUrl` prepends
+`API_ORIGIN` (the Go API origin, `http://127.0.0.1:8080`), so the browser is sent to
+`http://127.0.0.1:8080/console/sign-in` where Google OAuth actually starts.
+
+### Verified
+
+- `make check` passes
+- Console `tsc --noEmit` clean
+- Dev servers running on `:8080` and `:3001`, `GET /` returns 200
+- No other hardcoded `/console/` hrefs remain in the console components

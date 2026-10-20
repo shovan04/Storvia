@@ -86,10 +86,11 @@
   "drive": {
     "redirect_uri": "https://api.storvia.example/v1/storage/connections/google-drive/callback",
     "scopes": [
-      "https://www.googleapis.com/auth/drive.file"
+      "https://www.googleapis.com/auth/drive.file",
+      "https://www.googleapis.com/auth/drive.appdata"
     ],
     "root_folder_name": "Storvia",
-    "store_in_app_data_folder": false,
+    "store_in_app_data_folder": true,
     "preflight_timeout": "3s",
     "preflight_attempts": 2,
     "routing_budget": "8s",
