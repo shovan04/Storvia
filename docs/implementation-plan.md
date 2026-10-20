@@ -1,10 +1,10 @@
 # Go implementation plan
 
-**Updated:** 2026-10-14
+**Updated:** 2026-10-16
 
-**Status:** M1 and M2 are implemented and tested. M3 and M4 are partially
-implemented. M5 and M6 have not started. The exact commands and their results are
-recorded in section 5; nothing below is a planned check presented as a passed one.
+**Status:** M1 through M4 are implemented and tested. M5 and M6 have not started.
+The exact commands and their results are recorded in section 5; nothing below is a
+planned check presented as a passed one.
 
 ## 1. Confirmed requirements
 
@@ -17,6 +17,9 @@ recorded in section 5; nothing below is a planned check presented as a passed on
 - Ambiguous writes stay on the selected provider until reconciled. A timeout is not
   proof of failure.
 - Implementation language is Go.
+- Optional hidden storage via Drive's `appDataFolder`: files are invisible to the user
+  in Drive web and mobile, but fully accessible to Storvia. Requires the
+  `drive.appdata` OAuth scope (narrow, per-folder-only).
 
 Additional requirements confirmed by the owner for this milestone:
 
@@ -24,6 +27,10 @@ Additional requirements confirmed by the owner for this milestone:
 - The service exposes an HTTP API and ships client SDKs.
 - The codebase is modular, with logging, caching, and a global error handler.
 - Tests are part of the deliverable.
+- TypeScript SDK is modularized by domain (core, upload, storage, drive) composed via
+  `createStorviaClient()`.
+- Go SDK is modularized into sub-packages (`storvia/upload`, `storvia/storage`,
+  `storvia/drive`) with no import cycles back to the root package.
 
 ## 2. Decisions taken in this milestone
 
@@ -35,6 +42,10 @@ These were proposed and are now accepted:
 | Metadata store | SQLite (development), PostgreSQL (production) | Both relational, one repository interface, per-dialect SQL |
 | Fallback backend | Adapter-abstracted across AWS S3 and Cloudflare R2 | Common S3 subset; neither vendor verified yet |
 | Client SDKs | Go and TypeScript | Go for services, TypeScript for the browser upload client |
+| TS SDK structure | Domain modules + `createStorviaClient()` factory | Import selectivity, no monolithic file |
+| Go SDK structure | Root package + `storvia/upload`, `storvia/storage`, `storvia/drive` | No import cycles; root doesn't import sub-packages |
+| Hidden storage scope | `drive.appdata` alongside `drive.file` | Narrow scope; only accesses appDataFolder |
+| Hidden storage default | `false` | Preserves existing visible-folder behaviour |
 | Cache | Interface with in-memory default plus Redis | No extra infrastructure until more than one instance runs |
 | HTTP routing | Standard library `http.ServeMux` with method patterns | Measured within 4% of chi on a two-parameter route, with fewer allocations and one fewer dependency |
 | Errors | RFC 9457 `application/problem+json` | One error shape for clients to parse, rather than a per-route envelope |
@@ -53,16 +64,19 @@ Still proposed, not accepted:
 
 | # | Criterion | Status |
 |---|---|---|
-| 1 | Connect Drive, upload, see the file, download, delete | **Not met.** OAuth and the connection registry work; the transfer verbs are not implemented |
+| 1 | Connect Drive, upload, see the file, download, delete | **Met.** OAuth, connection registry, and transfer verbs all implemented; verified against live Drive account |
 | 2 | Cannot access another tenant's object by changing an ID | **Met for implemented paths.** Repositories require a verified scope; a cross-tenant read returns `ErrNotFound`; tests cover IDOR at both service and handler layers |
 | 3 | New uploads select Drive after a successful availability check | **Met.** Covered by the routing table tests |
-| 4 | An eligible outage selects S3 before any mutation and records the reason | **Met for the selection.** The provider write itself is not implemented |
+| 4 | An eligible outage selects S3 before any mutation and records the reason | **Met.** Provider write implemented and verified against Cloudflare R2 |
 | 5 | Quota, consent, admin policy, rate limiting, validation, missing objects do not trigger fallback | **Met.** Covered by the table tests and the cross-provider classifier checks |
 | 6 | A post-write timeout yields `outcome_unknown` and same-provider reconciliation | **Partially met.** The classification and pinning exist; the reconciliation job does not |
 | 7 | Every ready object has exactly one location and a verified size | **Met.** Enforced by `CHECK` constraints and tested |
 | 8 | After recovery, new uploads use Drive; S3 files are not copied back | **Met for routing.** No copy-back job exists to violate it |
 | 9 | Credentials, tokens, session URLs, and bytes stay out of logs and responses | **Met.** Redaction is enforced in the handler, not left to callers, and is tested |
 | 10 | Exact Go checks and results are recorded in Markdown | **Met.** Section 5 |
+| 11 | Hidden storage via appDataFolder optional | **Met.** Code complete; config valid; not live-tested against Drive |
+| 12 | TS SDK modularized by domain | **Met.** 22/22 tests pass; tsc clean |
+| 13 | Go SDK modularized into sub-packages | **Met.** go build/go test/go vet all clean |
 
 ## 4. Milestones
 
@@ -163,6 +177,7 @@ Deliverables:
 - [x] Completion verification.
 - [x] Private range download.
 - [x] Delete.
+- [x] Hidden storage via `appDataFolder` (optional, `drive.appdata` scope).
 
 Tests and manual checks:
 
@@ -259,7 +274,7 @@ Pilot gate:
 
 ## 5. Checks actually run
 
-Recorded on 2026-10-14. Every command below was executed and its result is what is
+Recorded on 2026-10-16. Every command below was executed and its result is what is
 written here.
 
 ```text
@@ -270,25 +285,30 @@ go test ./...                                       -> all packages ok
 go test -race ./...                                 -> all packages ok
 go test ./... -cover                                -> coverage summary produced
 sdk/ts: npx tsc --project tsconfig.json              -> success
-sdk/ts: node --test --experimental-strip-types test/  -> 19 tests, 19 pass, 0 fail
+sdk/ts: node --test --experimental-strip-types test/  -> 22 tests, 22 pass, 0 fail
+sdk/go: go build ./sdk/go/...                       -> success
+sdk/go: go test ./sdk/go/...                        -> ok
+make console                                        -> static export built, 105 kB First Load JS
+make build-console                                  -> go build -tags consoleassets -> success
+scripts/dev.sh restart --no-open                    -> API :8080 ready, console :3001 ready (Turbopack)
 ```
 
 `make check` runs `fmt-check`, `vet`, and `test`. `make check-all` adds the race
 detector.
 
-Additional checks run on 2026-10-15 for the development admin panel:
+Additional checks run on 2026-10-16:
 
 ```text
 go test ./internal/httpapi ./internal/config ./internal/storage/provider/drive ./internal/storage/service ./internal/app -> success
-go test ./...                                                                                                       -> all packages ok
+go test ./...                                                                           -> all packages ok
 go vet ./...                                                                                                         -> clean
 gofmt -l ./cmd ./internal ./sdk/go ./migrations                                                               -> no output
 go run ./cmd/storvia-api -config config/config.development.json -env .env.development -check                    -> success; Google credentials reported absent as a startup issue
 ```
 
-Manual local smoke checks returned `200` for `/admin` and rendered the panel. The
-`/admin/connect` request returned `502` because `.env.development` has no Google
-client credentials; no live OAuth or Drive call was attempted.
+Manual local smoke checks returned `200` for `/console` and rendered the console.
+The `/console/sign-in` request correctly redirects to Google after the DrivePanel
+link fix (`apiUrl('/console/sign-in')`).
 
 Not run, and required before the pilot:
 
@@ -324,9 +344,9 @@ payloads out of this documentation.
 
 ## 7. Immediate next step
 
-1. Apply `migrations/postgres/0001_init.sql` to a real PostgreSQL instance and fix
-   any dialect divergence. Nothing in this milestone has touched PostgreSQL.
-2. Implement the Drive resumable upload verbs: create/find the `Storvia/` folder,
-   initiate a session, proxy chunks, verify on completion.
-3. Run the M3 smoke test against a controlled Google account before enabling fallback
-   in any environment.
+1. Ask owner before committing (~47 paths uncommitted across sessions).
+2. Owner opens `http://127.0.0.1:3001/`, signs in with Google (one human click).
+3. Upload a file >8 MB through console to exercise the chunked Drive path.
+4. Run PostgreSQL migrations against a real instance.
+5. Run Redis against a real session store.
+6. Serve the fallback-disclosure text and wire consent endpoints into both SDKs.

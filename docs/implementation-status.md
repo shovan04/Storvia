@@ -9,10 +9,12 @@ project does and how to run it — get buried under churn.
 
 ---
 
-Early. The foundations are built and tested; the file transfer paths are not finished.
+Current (2026-10-16). Foundations are built and tested; the Drive transfer path is
+verified against a real Google account; both SDKs are modularized; hidden storage via
+Drive's `appDataFolder` is implemented but not live-tested.
 
 | Area | State |
-|---|---|
+|------|-------|
 | Routing policy engine | Complete, table-driven tests |
 | Error handling, logging, caching, configuration | Complete, tested |
 | Metadata store with enforced single-location invariant | Complete, tested on SQLite |
@@ -20,8 +22,10 @@ Early. The foundations are built and tested; the file transfer paths are not fin
 | Development admin panel | Complete; live OAuth round trip verified |
 | S3-compatible adapter | Complete, **verified against a live Cloudflare R2 bucket** |
 | HTTP API surface | Complete |
-| Go and TypeScript SDKs | Complete, tested |
+| Go SDK (root + upload/storage/drive sub-packages) | Complete, tested |
+| TypeScript SDK (core/upload/storage/drive + createStorviaClient) | Complete, 22/22 tests pass |
 | Drive resumable upload / download / delete | Complete, **verified against a real Drive account** |
+| Hidden Drive storage (appDataFolder) | Complete; **not live-tested** |
 | Reconciliation | Implemented; Drive's outcome is honestly `unknown` by design |
 | Job workers, leases, orphan sweep | Implemented; a worker was observed claiming and completing a real job |
 | Metrics (`/metrics`, Prometheus) | Implemented; 12 families served by the running binary |
@@ -29,6 +33,7 @@ Early. The foundations are built and tested; the file transfer paths are not fin
 | Testing console at `/console` | Implemented; backend verified against real R2, **the page has not been clicked in a browser** |
 | Forced-fallback operator switch | Implemented; verified with a real R2 upload while Drive was healthy |
 | Redis-backed session store | Implemented, **never run against a real Redis** |
+| PostgreSQL migrations | Written, **never run against real PostgreSQL** |
 
 ### What has actually been verified
 
@@ -46,9 +51,11 @@ This distinction matters more than the feature list, so it is stated plainly:
   visible in the reported state.
 - **Never run at all:** the PostgreSQL migrations (all testing is SQLite), and the Redis
   session store (only a failing stub).
+- **Not yet run for hidden storage:** `drive.appdata` scope has not been exercised
+  against a live Drive account; files in `appDataFolder` have not been observed in the
+  wild.
 
 See [`CHANGELOG.md`](CHANGELOG.md) for exactly what is missing and
 [`docs/implementation-plan.md`](docs/implementation-plan.md) for milestone status.
 
 ---
-
