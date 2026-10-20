@@ -3422,3 +3422,62 @@ matching what `console/components/SignInGate.tsx` already does. `apiUrl` prepend
 - Console `tsc --noEmit` clean
 - Dev servers running on `:8080` and `:3001`, `GET /` returns 200
 - No other hardcoded `/console/` hrefs remain in the console components
+
+---
+
+## 2026-10-16 — Hidden Drive storage, modular SDKs, and console fixes
+
+### Hidden Drive storage via appDataFolder
+
+**The problem:** Stored files lived in a visible "Storvia" folder in the user's Google Drive. Anyone with Drive access could see them. For WhatsApp-style backup use cases, files must be invisible in Drive web and mobile.
+
+**The solution:** `drive.store_in_app_data_folder` (default `false`). When enabled, files are written to Drive's `appDataFolder` — visible only to Storvia, never to the user in Drive.
+
+**Changes:**
+- **`internal/config/config.go`**: Added `StoreInAppDataFolder` to `DriveConfig`. `validateDrive()` now accepts both `drive.file` and `drive.appdata` scopes; broader scopes are still rejected.
+- **`internal/storage/provider/drive/client.go`**: Added `ScopeDriveAppData` constant. `Config` gained `StoreInAppDataFolder` bool. Scope validation permits both scopes. `UsesAppDataFolder()` method added.
+- **`internal/storage/provider/drive/files.go`**: `InitiateUpload` uses `appDataFolder` as the parent when hidden mode is on (no visible folder created). `usableConnection` skips the `RootFolderID` check in hidden mode (`appDataFolder` is implicit).
+- **`internal/storage/service/connections.go`**: `ConnectionStatus.UsesAppDataFolder` field added. `DriveConnector.Status()` sets it based on client config; `FolderPresent` is always true in hidden mode.
+- **`internal/httpapi/console_api.go`**: `Connection.UsesAppDataFolder` field added and populated in `State`. `driveUsesAppDataFolder()` helper for `EnsureFolder` (no-op in hidden mode).
+- **`internal/httpapi/console_oauth.go`**: `EnsureFolder` returns `{"created": false, "app_data_folder": true}` in hidden mode.
+- **Config files**: Both `config/config.development.json` and `config/config.production.json` now include `drive.appdata` scope and `store_in_app_data_folder: true`.
+- **Console UI**: `DrivePanel` shows "Hidden storage (appDataFolder) — not visible in Drive web/app" and hides the folder creation button. `ObjectTable` shows a hint explaining hidden storage and adds "View in Drive" links per file (note: these links 404 when opened by the user, since the file is hidden from them).
+- **Types**: `console/lib/types.ts` `Connection` gained `uses_app_data_folder`.
+
+**Verified:** `make check` passes. Config validation accepts both scopes, rejects others. `scripts/dev.sh restart` works, `GET /` returns 200.
+
+**Not done:** Existing connections must re-consent (new `drive.appdata` scope). No commit created.
+
+### Modular TypeScript SDK
+
+The TypeScript SDK (`sdk/ts/`) was split from one monolithic `client.ts` into domain modules:
+
+- **`src/core.ts`**: `StorviaClient` base class (transport, error handling), `StorviaError`, `TransportError`, `ErrorKind`, `Problem`, options types, `kindFromProblemType`, `kindForStatus`.
+- **`src/upload.ts`**: `UploadClient` class, `UploadMode`, `CreateUploadRequest`, `CreateUploadResult`, `DriveSession`, `PresignedPart`, `UploadView`, `ReconcileResult`, chunked upload helper.
+- **`src/storage.ts`**: `StorageClient` class, `StorviaObject`, `StorageStatus`, object CRUD, download.
+- **`src/drive.ts`**: `DriveClient` class, `DriveConnection`, Drive connection lifecycle.
+- **`src/index.ts`**: Re-exports everything, plus `createStorviaClient()` factory that wires all domain clients into a `StorviaClient`.
+
+`StorviaClient` composes sub-clients (`upload`, `storage`, `drive`) and delegates methods to them for backward compatibility. `new StorviaClient()` still works but leaves domain clients unset; use `createStorviaClient()` for a fully wired client.
+
+**Verified:** `tsc --noEmit` clean. All 22 tests pass.
+
+### Modular Go SDK
+
+The Go SDK (`sdk/go/`) was split into sub-packages under `sdk/go/storvia/`:
+
+- **`storvia/`** (root): `Client`, `Config`, `APIError`, `Kind`, `DoRequest`, `DoRaw`, `WithToken`, `StatusCode`, `IsKind`, `Download`, scope constants (`ScopeDriveFile`, `ScopeDriveAppData`), HTTP client accessor (`HTTPClient()`).
+- **`storvia/upload/`**: `UploadMode`, `PresignedPart`, `CreateUploadRequest`, `CreateUploadResult`, `DriveSession`, `UploadView`, `ReconcileResult`, `Upload` type with methods (`UploadAll`, `Complete`, `CompleteDrive`, `Status`, `Reconcile`), standalone functions (`CreateUpload`, `GetUpload`, `CancelUpload`, `ReconcileUpload`, `CompleteUpload`).
+- **`storvia/storage/`**: `StorviaObject`, `StorageStatus`, `DriveConnection`, standalone functions (`Status`, `GetObject`, `DeleteObject`, `Download`, `DownloadRange`, `GetDriveConnection`, `StartDriveConnection`, `DisconnectDrive`).
+- **`storvia/drive/`**: `DriveConnection` alias, scope constants (`ScopeDriveFile`, `ScopeDriveAppData`).
+
+Root package does not import sub-packages (no import cycles). Sub-packages import root for core types.
+
+**Verified:** `go build ./...`, `go test ./sdk/go/...` pass. `go vet` clean.
+
+### Console fix: "Connect Google Drive" 404 after disconnect
+
+`DrivePanel` used a bare `<a href="/console/sign-in">` which resolved against Next.js on `:3001` (404). Changed to `apiUrl('/console/sign-in')` which targets the Go API on `:8080`, matching `SignInGate.tsx`.
+
+**Verified:** Console compiles and serves. No other hardcoded `/console/` hrefs remain.
+

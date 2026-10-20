@@ -9,7 +9,12 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { StorviaClient, StorviaError, TransportError } from '../src/index.ts';
+import {
+  createStorviaClient,
+  StorviaClient,
+  StorviaError,
+  TransportError,
+} from '../src/index.ts';
 
 /** Builds a client backed by a stub fetch that records what it was asked to send. */
 function stubClient(
@@ -22,7 +27,7 @@ function stubClient(
     return respond(href, init);
   }) as typeof fetch;
 
-  const client = new StorviaClient({
+  const client = createStorviaClient({
     baseUrl: 'https://api.example.test',
     token: 'test-token',
     fetch: stubFetch,
@@ -254,7 +259,7 @@ describe('error handling', () => {
   });
 
   it('treats a transport failure as an unknown outcome', async () => {
-    const client = new StorviaClient({
+    const client = createStorviaClient({
       baseUrl: 'https://api.example.test',
       fetch: (async () => {
         throw new Error('socket hang up');
@@ -317,8 +322,8 @@ describe('status and connections', () => {
       () =>
         new Response(JSON.stringify({ authorize_url: '', expires_in_seconds: 0 }), {
           status: 201,
-          headers: { 'Content-Type': 'application/json' },
-        }),
+          headers: { 'Content-Type': 'application/json' } },
+        ),
     );
     await assert.rejects(() => client.startDriveConnection());
   });
@@ -415,8 +420,8 @@ describe('upload helper', () => {
       );
     }) as typeof fetch;
 
-    const client = new StorviaClient({ baseUrl: 'https://storvia.test' });
-    const { object } = await client.upload(
+    const client = createStorviaClient({ baseUrl: 'https://storvia.test' });
+    const { object } = await client.upload.upload(
       { name: 'a.bin', mime_type: 'application/octet-stream', size_bytes: size, category: 'report' },
       new Blob([new Uint8Array(size)]),
       { idempotencyKey: 'k' },
@@ -455,10 +460,10 @@ describe('upload helper', () => {
       );
     }) as typeof fetch;
 
-    const client = new StorviaClient({ baseUrl: 'https://storvia.test' });
+    const client = createStorviaClient({ baseUrl: 'https://storvia.test' });
     await assert.rejects(
       () =>
-        client.upload(
+        client.upload.upload(
           { name: 'a.bin', mime_type: 'application/octet-stream', size_bytes: 100, category: 'report' },
           new Blob([new Uint8Array(100)]),
           { idempotencyKey: 'k' },
@@ -489,10 +494,10 @@ describe('upload helper', () => {
       );
     }) as typeof fetch;
 
-    const client = new StorviaClient({ baseUrl: 'https://storvia.test' });
+    const client = createStorviaClient({ baseUrl: 'https://storvia.test' });
     await assert.rejects(
       () =>
-        client.upload(
+        client.upload.upload(
           { name: 'a.bin', mime_type: 'application/octet-stream', size_bytes: 100, category: 'report' },
           new Blob([new Uint8Array(100)]),
           { idempotencyKey: 'k' },

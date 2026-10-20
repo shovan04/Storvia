@@ -45,6 +45,16 @@ const (
 	KindInternal              Kind = "internal"
 )
 
+// Google OAuth scopes for Drive access.
+const (
+	// ScopeDriveFile is the narrow per-file scope. It lets Storvia access only
+	// the files it creates or the user opens through Storvia.
+	ScopeDriveFile = "https://www.googleapis.com/auth/drive.file"
+	// ScopeDriveAppData is the app-data scope. It lets Storvia store files in
+	// Drive's appDataFolder, which is visible only to Storvia.
+	ScopeDriveAppData = "https://www.googleapis.com/auth/drive.appdata"
+)
+
 // problem is the RFC 9457 body the API returns for every failure.
 type problem struct {
 	Type   string            `json:"type"`
@@ -155,8 +165,17 @@ func New(cfg Config) (*Client, error) {
 // BaseURL returns the configured API root.
 func (c *Client) BaseURL() string { return c.baseURL.String() }
 
+// HTTPClient returns the underlying HTTP client, for sub-packages that need to
+// make raw provider requests (Drive resumable chunks, presigned parts).
+func (c *Client) HTTPClient() *http.Client {
+	return c.httpClient
+}
+
 // requestOption customizes one request.
 type requestOption func(*http.Request)
+
+// RequestOption is the public alias of requestOption, available to sub-packages.
+type RequestOption = requestOption
 
 // withIdempotencyKey attaches the key that makes a retried create safe.
 //
@@ -168,12 +187,18 @@ func withIdempotencyKey(key string) requestOption {
 	}
 }
 
+// WithIdempotencyKey is the exported form of withIdempotencyKey.
+var WithIdempotencyKey = withIdempotencyKey
+
 // withBearer uses an Authorization header instead of the session cookie.
 func withBearer(token string) requestOption {
 	return func(r *http.Request) {
 		r.Header.Set("Authorization", "Bearer "+token)
 	}
 }
+
+// WithBearer is the exported form of withBearer.
+var WithBearer = withBearer
 
 // do performs a JSON request and decodes the response.
 func (c *Client) do(ctx context.Context, method, path string, body any, out any, opts ...requestOption) error {
@@ -188,11 +213,23 @@ func (c *Client) do(ctx context.Context, method, path string, body any, out any,
 	return c.doRaw(ctx, method, path, reader, out, contentTypeJSON, opts...)
 }
 
+// DoRequest is the exported form of do, available to sub-packages and advanced
+// callers who need to build their own request logic on top of the client.
+func (c *Client) DoRequest(ctx context.Context, method, path string, body any, out any, opts ...RequestOption) error {
+	return c.do(ctx, method, path, body, out, opts...)
+}
+
 // contentType values for the two body shapes.
 const (
 	contentTypeJSON   = "application/json"
 	contentTypeBinary = "application/octet-stream"
 )
+
+// ContentTypeJSON is the exported form of contentTypeJSON.
+var ContentTypeJSON = contentTypeJSON
+
+// ContentTypeBinary is the exported form of contentTypeBinary.
+var ContentTypeBinary = contentTypeBinary
 
 // doRaw performs a request whose body is streamed rather than JSON encoded.
 //
