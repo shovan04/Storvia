@@ -28,7 +28,10 @@ New upload -> authenticate + validate -> read-only Drive availability check
                          DB stores owner, status, provider pointer
 ```
 
-1. The user signs in and separately connects Drive with the narrow `drive.file` scope.
+1. The user signs in and separately connects Drive with the narrow `drive.file`
+   scope. Optionally `drive.appdata` is added when hidden storage is enabled, which
+   places files in Drive's `appDataFolder` — visible only to Storvia, not in the
+   user's Drive web or mobile app.
 2. Storvia checks permissions, limits, consent, and Drive availability before any write.
 3. The upload goes to one provider, and the location is verified before the file is
    marked ready.
@@ -99,6 +102,10 @@ What it does:
 - **Force the fallback provider** — or go back to Google Drive, or follow the configured
   default.
 - **Simulate a Drive outage.** Off by default, so uploads use the real Drive path.
+- **Hidden storage.** When `drive.store_in_app_data_folder` is enabled, files go to
+  Drive's `appDataFolder` and are invisible in Drive web and mobile. The Drive panel
+  shows this state; "View in Drive" links exist but will 404 for the user signed in
+  as themselves.
 
 ### How it is built
 
@@ -348,8 +355,11 @@ DELETE /v1/storage/fallback/consent   # withdraw
 4. Set `STORVIA_GOOGLE_CLIENT_ID` and `STORVIA_GOOGLE_CLIENT_SECRET`.
 
 Storvia requests only `https://www.googleapis.com/auth/drive.file`, a non-sensitive
-per-file scope covering files the app creates. That scope is enforced at
-construction; a config naming a broader scope fails to load.
+per-file scope covering files the app creates. Optionally
+`https://www.googleapis.com/auth/drive.appdata` is added when hidden storage is
+enabled; it grants access only to Drive's `appDataFolder`, where Storvia can write
+files that are invisible to the user in Drive web and mobile. Both scopes are
+enforced at construction; a config naming a broader scope fails to load.
 
 ### Development console
 
@@ -376,12 +386,22 @@ authorization codes, or Drive session URLs.
 
 ### Go
 
+The SDK is modular: the root `storvia` package holds the core client, and
+sub-packages (`storvia/upload`, `storvia/storage`, `storvia/drive`) hold
+domain-specific types and functions. The root package does not import its
+sub-packages, so you can pull in only what you need.
+
 ```go
+import (
+	storvia "github.com/shovan04/storvia/sdk/go"
+	storviaUpload "github.com/shovan04/storvia/sdk/go/storvia/upload"
+)
+
 client, _ := storvia.New(storvia.Config{BaseURL: "https://api.your-host"})
 
 // The idempotency key must be stable across retries. A fresh key per attempt
 // defeats the protection and can create a duplicate file.
-result, err := client.CreateUpload(ctx, uploadKey, storvia.CreateUploadRequest{
+result, err := storviaUpload.CreateUpload(client, ctx, uploadKey, storvia.CreateUploadRequest{
     Name:      "report.pdf",
     MIMEType:  "application/pdf",
     SizeBytes: 10 << 20,
@@ -389,20 +409,28 @@ result, err := client.CreateUpload(ctx, uploadKey, storvia.CreateUploadRequest{
 })
 
 switch result.Mode {
-case storvia.ModeDriveResumableSession:
+case storviaUpload.ModeDriveResumableSession:
     // The session URL in result.Session is a write capability for this one file.
     // upload.UploadAll streams to it, then upload.CompleteDrive sends the file id.
-case storvia.ModeS3PresignedParts:
+    u := storviaUpload.New(client, storvia.CreateUploadRequest{}, result)
+    err = u.UploadAll(ctx, fileReader)
+    err = u.CompleteDrive(ctx, driveFileID)
+case storviaUpload.ModeS3PresignedParts:
     // Upload parts directly with result.Parts. Those URLs are bearer tokens.
 }
 ```
 
 ### TypeScript
 
-```ts
-const client = new StorviaClient({ baseUrl: 'https://api.your-host' });
+The SDK is modular: `src/core.ts`, `src/upload.ts`, `src/storage.ts`, and
+`src/drive.ts` are composed into `StorviaClient` via `createStorviaClient()`.
 
-const { object } = await client.upload(
+```ts
+import { createStorviaClient } from '@storvia/sdk';
+
+const client = createStorviaClient({ baseUrl: 'https://api.your-host' });
+
+const { object } = await client.upload.upload(
   { name: 'report.pdf', mime_type: 'application/pdf', size_bytes: file.size, category: 'report' },
   file,
   { idempotencyKey },
