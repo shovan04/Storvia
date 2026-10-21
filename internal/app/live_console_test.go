@@ -13,10 +13,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/shovan04/storvia/internal/auth"
-	"github.com/shovan04/storvia/internal/config"
-	"github.com/shovan04/storvia/internal/httpapi"
-	"github.com/shovan04/storvia/internal/persistence"
+	"github.com/shovan04/storvia-project/internal/auth"
+	"github.com/shovan04/storvia-project/internal/config"
+	"github.com/shovan04/storvia-project/internal/httpapi"
+	"github.com/shovan04/storvia-project/internal/persistence"
 )
 
 // TestLiveConsoleForcedFallbackUpload exercises the console the way an operator would:

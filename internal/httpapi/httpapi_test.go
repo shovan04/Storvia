@@ -12,8 +12,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/shovan04/storvia/internal/apperr"
-	"github.com/shovan04/storvia/internal/auth"
+	"github.com/shovan04/storvia-project/internal/apperr"
+	"github.com/shovan04/storvia-project/internal/auth"
 )
 
 // decodeProblem parses an error response body.

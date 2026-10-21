@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/shovan04/storvia/internal/storage/policy"
-	"github.com/shovan04/storvia/internal/storage/provider/drive"
+	"github.com/shovan04/storvia-project/internal/storage/policy"
+	"github.com/shovan04/storvia-project/internal/storage/provider/drive"
 )
 
 // ChangesPoller advances Drive's change log for every connected account.

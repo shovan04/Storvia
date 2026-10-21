@@ -5,10 +5,10 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/shovan04/storvia/internal/persistence"
-	"github.com/shovan04/storvia/internal/storage/model"
-	"github.com/shovan04/storvia/internal/storage/policy"
-	"github.com/shovan04/storvia/internal/storage/provider/drive"
+	"github.com/shovan04/storvia-project/internal/persistence"
+	"github.com/shovan04/storvia-project/internal/storage/model"
+	"github.com/shovan04/storvia-project/internal/storage/policy"
+	"github.com/shovan04/storvia-project/internal/storage/provider/drive"
 )
 
 // fakeDriveSessions stands in for the Drive provider's resumable-session verbs.

@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/shovan04/storvia/internal/idid"
-	"github.com/shovan04/storvia/internal/secrets"
+	"github.com/shovan04/storvia-project/internal/idid"
+	"github.com/shovan04/storvia-project/internal/secrets"
 )
 
 // DriveConnection is the stored Drive connection row.

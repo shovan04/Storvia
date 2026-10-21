@@ -11,7 +11,7 @@ import (
 	"testing/fstest"
 	"time"
 
-	"github.com/shovan04/storvia/internal/auth"
+	"github.com/shovan04/storvia-project/internal/auth"
 )
 
 // stubRouting is a RoutingControl driven by the test.

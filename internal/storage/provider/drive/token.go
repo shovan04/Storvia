@@ -9,8 +9,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/shovan04/storvia/internal/persistence"
-	"github.com/shovan04/storvia/internal/storage/policy"
+	"github.com/shovan04/storvia-project/internal/persistence"
+	"github.com/shovan04/storvia-project/internal/storage/policy"
 )
 
 // accessToken returns a usable access token for a connection, refreshing if needed.

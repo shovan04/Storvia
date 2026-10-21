@@ -1,7 +1,7 @@
 package persistence
 
 import (
-	"github.com/shovan04/storvia/internal/storage/model"
+	"github.com/shovan04/storvia-project/internal/storage/model"
 )
 
 // LogicalObjectForTest lets the persistence tests build object fixtures without

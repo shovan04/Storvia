@@ -6,12 +6,12 @@ import (
 	"errors"
 	"time"
 
-	"github.com/shovan04/storvia/internal/httpapi"
-	"github.com/shovan04/storvia/internal/persistence"
-	"github.com/shovan04/storvia/internal/storage/policy"
-	"github.com/shovan04/storvia/internal/storage/provider/drive"
-	"github.com/shovan04/storvia/internal/storage/provider/s3compat"
-	"github.com/shovan04/storvia/internal/storage/service"
+	"github.com/shovan04/storvia-project/internal/httpapi"
+	"github.com/shovan04/storvia-project/internal/persistence"
+	"github.com/shovan04/storvia-project/internal/storage/policy"
+	"github.com/shovan04/storvia-project/internal/storage/provider/drive"
+	"github.com/shovan04/storvia-project/internal/storage/provider/s3compat"
+	"github.com/shovan04/storvia-project/internal/storage/service"
 )
 
 // diagnostics answers the panel's questions by actually calling the providers.

@@ -8,9 +8,9 @@ import (
 
 	"strings"
 
-	"github.com/shovan04/storvia/internal/apperr"
-	"github.com/shovan04/storvia/internal/persistence"
-	"github.com/shovan04/storvia/internal/storage/provider/drive"
+	"github.com/shovan04/storvia-project/internal/apperr"
+	"github.com/shovan04/storvia-project/internal/persistence"
+	"github.com/shovan04/storvia-project/internal/storage/provider/drive"
 )
 
 // OAuthStateTTL is how long a pending authorization stays valid.

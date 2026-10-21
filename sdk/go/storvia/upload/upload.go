@@ -23,7 +23,7 @@ import (
 	"io"
 	"net/http"
 
-	storvia "github.com/shovan04/storvia/sdk/go"
+	storvia "github.com/shovan04/storvia-sdk"
 )
 
 // UploadMode is the transfer mechanism the server selected. The client never

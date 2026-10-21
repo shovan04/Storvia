@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/shovan04/storvia/internal/auth"
-	"github.com/shovan04/storvia/internal/storage/service"
+	"github.com/shovan04/storvia-project/internal/auth"
+	"github.com/shovan04/storvia-project/internal/storage/service"
 )
 
 // TestOAuthIsEntirelyBackendLogic pins the division of responsibility.

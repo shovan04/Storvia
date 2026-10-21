@@ -1,4 +1,4 @@
-module github.com/shovan04/storvia
+module github.com/shovan04/storvia-project
 
 go 1.27.1
 

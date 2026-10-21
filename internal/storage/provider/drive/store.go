@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/shovan04/storvia/internal/persistence"
+	"github.com/shovan04/storvia-project/internal/persistence"
 )
 
 // Store is the persistence surface the Drive provider needs.

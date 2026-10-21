@@ -3,9 +3,9 @@ package httpapi
 import (
 	"context"
 
-	"github.com/shovan04/storvia/internal/auth"
-	"github.com/shovan04/storvia/internal/logger"
-	"github.com/shovan04/storvia/internal/storage/model"
+	"github.com/shovan04/storvia-project/internal/auth"
+	"github.com/shovan04/storvia-project/internal/logger"
+	"github.com/shovan04/storvia-project/internal/storage/model"
 )
 
 // loggerWithCorrelationID forwards to the logger package so the middleware tests

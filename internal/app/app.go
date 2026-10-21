@@ -17,17 +17,17 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/shovan04/storvia/internal/auth"
-	"github.com/shovan04/storvia/internal/cache"
-	"github.com/shovan04/storvia/internal/config"
-	"github.com/shovan04/storvia/internal/httpapi"
-	"github.com/shovan04/storvia/internal/idid"
-	"github.com/shovan04/storvia/internal/metrics"
-	"github.com/shovan04/storvia/internal/persistence"
-	"github.com/shovan04/storvia/internal/secrets"
-	"github.com/shovan04/storvia/internal/storage/provider/drive"
-	"github.com/shovan04/storvia/internal/storage/provider/s3compat"
-	"github.com/shovan04/storvia/internal/storage/service"
+	"github.com/shovan04/storvia-project/internal/auth"
+	"github.com/shovan04/storvia-project/internal/cache"
+	"github.com/shovan04/storvia-project/internal/config"
+	"github.com/shovan04/storvia-project/internal/httpapi"
+	"github.com/shovan04/storvia-project/internal/idid"
+	"github.com/shovan04/storvia-project/internal/metrics"
+	"github.com/shovan04/storvia-project/internal/persistence"
+	"github.com/shovan04/storvia-project/internal/secrets"
+	"github.com/shovan04/storvia-project/internal/storage/provider/drive"
+	"github.com/shovan04/storvia-project/internal/storage/provider/s3compat"
+	"github.com/shovan04/storvia-project/internal/storage/service"
 )
 
 // App is the assembled service.

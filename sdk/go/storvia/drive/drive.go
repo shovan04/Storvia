@@ -10,7 +10,7 @@
 package drive
 
 import (
-	storvia "github.com/shovan04/storvia/sdk/go"
+	storvia "github.com/shovan04/storvia-sdk"
 )
 
 // DriveConnection is an alias for storvia.DriveConnection, provided for

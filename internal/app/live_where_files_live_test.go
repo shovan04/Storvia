@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/shovan04/storvia/internal/config"
-	"github.com/shovan04/storvia/internal/persistence"
+	"github.com/shovan04/storvia-project/internal/config"
+	"github.com/shovan04/storvia-project/internal/persistence"
 )
 
 // resolveDevDBPath points the loaded config at the repository's development database.

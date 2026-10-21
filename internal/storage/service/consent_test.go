@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/shovan04/storvia/internal/persistence"
+	"github.com/shovan04/storvia-project/internal/persistence"
 )
 
 // stubConsentStore is an in-memory ConsentStore for the gate test.

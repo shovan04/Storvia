@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/shovan04/storvia/internal/apperr"
-	"github.com/shovan04/storvia/internal/persistence"
-	"github.com/shovan04/storvia/internal/storage/model"
+	"github.com/shovan04/storvia-project/internal/apperr"
+	"github.com/shovan04/storvia-project/internal/persistence"
+	"github.com/shovan04/storvia-project/internal/storage/model"
 )
 
 // UploadView is the client-facing state of an upload.

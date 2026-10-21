@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"testing"
 
-	"github.com/shovan04/storvia/internal/persistence"
+	"github.com/shovan04/storvia-project/internal/persistence"
 )
 
 // TestBuildWiresTheOutageFallbackDependencies is the regression guard for two wiring

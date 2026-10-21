@@ -13,13 +13,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/shovan04/storvia/internal/auth"
-	"github.com/shovan04/storvia/internal/config"
-	"github.com/shovan04/storvia/internal/idid"
-	"github.com/shovan04/storvia/internal/persistence"
-	"github.com/shovan04/storvia/internal/storage/model"
-	"github.com/shovan04/storvia/internal/storage/policy"
-	"github.com/shovan04/storvia/internal/storage/service"
+	"github.com/shovan04/storvia-project/internal/auth"
+	"github.com/shovan04/storvia-project/internal/config"
+	"github.com/shovan04/storvia-project/internal/idid"
+	"github.com/shovan04/storvia-project/internal/persistence"
+	"github.com/shovan04/storvia-project/internal/storage/model"
+	"github.com/shovan04/storvia-project/internal/storage/policy"
+	"github.com/shovan04/storvia-project/internal/storage/service"
 )
 
 // These tests drive the real handlers over HTTP against a real service and a real

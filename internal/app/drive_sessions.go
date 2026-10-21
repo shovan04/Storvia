@@ -3,10 +3,10 @@ package app
 import (
 	"context"
 
-	"github.com/shovan04/storvia/internal/persistence"
-	"github.com/shovan04/storvia/internal/storage/model"
-	"github.com/shovan04/storvia/internal/storage/provider/drive"
-	"github.com/shovan04/storvia/internal/storage/service"
+	"github.com/shovan04/storvia-project/internal/persistence"
+	"github.com/shovan04/storvia-project/internal/storage/model"
+	"github.com/shovan04/storvia-project/internal/storage/provider/drive"
+	"github.com/shovan04/storvia-project/internal/storage/service"
 )
 
 // driveSessions adapts the Drive provider to the coordinator's upload port.

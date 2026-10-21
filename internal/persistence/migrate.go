@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	storviaMigrations "github.com/shovan04/storvia/migrations"
+	storviaMigrations "github.com/shovan04/storvia-project/migrations"
 )
 
 // migrationFS carries the SQL for both dialects so a binary can migrate without

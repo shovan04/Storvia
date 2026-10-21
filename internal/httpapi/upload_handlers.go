@@ -7,11 +7,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/shovan04/storvia/internal/apperr"
-	"github.com/shovan04/storvia/internal/cache"
-	"github.com/shovan04/storvia/internal/config"
-	"github.com/shovan04/storvia/internal/metrics"
-	"github.com/shovan04/storvia/internal/storage/service"
+	"github.com/shovan04/storvia-project/internal/apperr"
+	"github.com/shovan04/storvia-project/internal/cache"
+	"github.com/shovan04/storvia-project/internal/config"
+	"github.com/shovan04/storvia-project/internal/metrics"
+	"github.com/shovan04/storvia-project/internal/storage/service"
 )
 
 // UploadHandler exposes the upload use cases over HTTP.

@@ -17,7 +17,7 @@ package storage
 import (
 	"context"
 
-	storvia "github.com/shovan04/storvia/sdk/go"
+	storvia "github.com/shovan04/storvia-sdk"
 )
 
 // StorviaObject describes a stored file.

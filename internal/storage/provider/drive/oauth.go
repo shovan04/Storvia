@@ -11,8 +11,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/shovan04/storvia/internal/apperr"
-	"github.com/shovan04/storvia/internal/persistence"
+	"github.com/shovan04/storvia-project/internal/apperr"
+	"github.com/shovan04/storvia-project/internal/persistence"
 )
 
 // AuthorizeURL builds the Google consent URL for a tenant.

@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/shovan04/storvia/internal/persistence"
-	"github.com/shovan04/storvia/internal/storage/policy"
+	"github.com/shovan04/storvia-project/internal/persistence"
+	"github.com/shovan04/storvia-project/internal/storage/policy"
 )
 
 // The provider's endpoints are absolute constants pointing at googleapis.com, so a

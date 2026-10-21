@@ -13,9 +13,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/shovan04/storvia/internal/apperr"
-	"github.com/shovan04/storvia/internal/auth"
-	"github.com/shovan04/storvia/internal/logger"
+	"github.com/shovan04/storvia-project/internal/apperr"
+	"github.com/shovan04/storvia-project/internal/auth"
+	"github.com/shovan04/storvia-project/internal/logger"
 )
 
 // Middleware decorates an http.Handler.

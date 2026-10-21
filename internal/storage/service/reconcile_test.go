@@ -5,10 +5,10 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/shovan04/storvia/internal/apperr"
-	"github.com/shovan04/storvia/internal/persistence"
-	"github.com/shovan04/storvia/internal/storage/model"
-	"github.com/shovan04/storvia/internal/storage/policy"
+	"github.com/shovan04/storvia-project/internal/apperr"
+	"github.com/shovan04/storvia-project/internal/persistence"
+	"github.com/shovan04/storvia-project/internal/storage/model"
+	"github.com/shovan04/storvia-project/internal/storage/policy"
 )
 
 // fallbackWithNilUploader plans against the fallback, then removes the capability so
