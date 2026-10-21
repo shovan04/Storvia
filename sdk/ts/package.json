@@ -1,5 +1,5 @@
 {
-  "name": "@storvia/sdk",
+  "name": "@shovan04/storvia-ts",
   "version": "0.1.0",
   "description": "TypeScript client for the Storvia Drive-first file storage API",
   "license": "Apache-2.0",
