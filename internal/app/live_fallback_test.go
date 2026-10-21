@@ -13,11 +13,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/shovan04/storvia/internal/config"
-	"github.com/shovan04/storvia/internal/persistence"
-	"github.com/shovan04/storvia/internal/secrets"
-	"github.com/shovan04/storvia/internal/storage/model"
-	"github.com/shovan04/storvia/internal/storage/service"
+	"github.com/shovan04/storvia-project/internal/config"
+	"github.com/shovan04/storvia-project/internal/persistence"
+	"github.com/shovan04/storvia-project/internal/secrets"
+	"github.com/shovan04/storvia-project/internal/storage/model"
+	"github.com/shovan04/storvia-project/internal/storage/service"
 )
 
 // liveFallbackEnvOptIn is the switch for every test that touches a real

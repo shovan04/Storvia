@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/shovan04/storvia/internal/persistence"
+	"github.com/shovan04/storvia-project/internal/persistence"
 )
 
 var (

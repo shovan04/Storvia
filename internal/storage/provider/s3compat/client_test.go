@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/shovan04/storvia/internal/storage/model"
-	"github.com/shovan04/storvia/internal/storage/policy"
+	"github.com/shovan04/storvia-project/internal/storage/model"
+	"github.com/shovan04/storvia-project/internal/storage/policy"
 )
 
 // validConfig returns a configuration that passes validation.

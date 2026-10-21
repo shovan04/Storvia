@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/shovan04/storvia/internal/apperr"
-	"github.com/shovan04/storvia/internal/persistence"
+	"github.com/shovan04/storvia-project/internal/apperr"
+	"github.com/shovan04/storvia-project/internal/persistence"
 )
 
 // ConsentStore records and reads a tenant's acceptance of the outage-fallback

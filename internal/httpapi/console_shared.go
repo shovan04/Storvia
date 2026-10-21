@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/shovan04/storvia/internal/persistence"
-	"github.com/shovan04/storvia/internal/storage/service"
+	"github.com/shovan04/storvia-project/internal/persistence"
+	"github.com/shovan04/storvia-project/internal/storage/service"
 )
 
 type AdminPanelConfig struct {

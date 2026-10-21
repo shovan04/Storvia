@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/shovan04/storvia/internal/storage/model"
-	"github.com/shovan04/storvia/internal/storage/provider/s3compat"
-	"github.com/shovan04/storvia/internal/storage/service"
+	"github.com/shovan04/storvia-project/internal/storage/model"
+	"github.com/shovan04/storvia-project/internal/storage/provider/s3compat"
+	"github.com/shovan04/storvia-project/internal/storage/service"
 )
 
 // fallbackUploader adapts the S3-compatible clients to the service's narrow port.

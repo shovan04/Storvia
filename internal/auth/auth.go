@@ -19,7 +19,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/shovan04/storvia/internal/apperr"
+	"github.com/shovan04/storvia-project/internal/apperr"
 )
 
 // Identity is the authenticated caller.

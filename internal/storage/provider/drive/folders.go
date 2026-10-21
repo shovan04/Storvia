@@ -10,8 +10,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/shovan04/storvia/internal/persistence"
-	"github.com/shovan04/storvia/internal/storage/policy"
+	"github.com/shovan04/storvia-project/internal/persistence"
+	"github.com/shovan04/storvia-project/internal/storage/policy"
 )
 
 // folderMimeType is the Drive mime type for a folder.

@@ -10,7 +10,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/shovan04/storvia/internal/storage/policy"
+	"github.com/shovan04/storvia-project/internal/storage/policy"
 )
 
 // changesEndpoint is Drive's change log. It is separate from driveFilesURL for the same

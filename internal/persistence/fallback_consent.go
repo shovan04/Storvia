@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/shovan04/storvia/internal/idid"
+	"github.com/shovan04/storvia-project/internal/idid"
 )
 
 // CurrentDisclosureVersion is the version of the outage-fallback disclosure a

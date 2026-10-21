@@ -10,8 +10,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/shovan04/storvia/internal/httpapi"
-	"github.com/shovan04/storvia/internal/persistence"
+	"github.com/shovan04/storvia-project/internal/httpapi"
+	"github.com/shovan04/storvia-project/internal/persistence"
 )
 
 // liveDriveEnvOptIn gates the tests that write to a real Google Drive account.

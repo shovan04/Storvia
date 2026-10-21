@@ -13,8 +13,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/shovan04/storvia/internal/apperr"
-	"github.com/shovan04/storvia/internal/logger"
+	"github.com/shovan04/storvia-project/internal/apperr"
+	"github.com/shovan04/storvia-project/internal/logger"
 )
 
 // Problem is the RFC 9457 problem details body.

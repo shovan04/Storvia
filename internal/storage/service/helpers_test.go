@@ -5,7 +5,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/shovan04/storvia/internal/apperr"
+	"github.com/shovan04/storvia-project/internal/apperr"
 )
 
 // readerFromString adapts a string to a reader for the content-source stub.

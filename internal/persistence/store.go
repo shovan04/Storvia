@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/shovan04/storvia/internal/config"
+	"github.com/shovan04/storvia-project/internal/config"
 
 	_ "github.com/jackc/pgx/v5/stdlib" // postgres driver
 	_ "modernc.org/sqlite"             // pure-Go sqlite driver, no cgo

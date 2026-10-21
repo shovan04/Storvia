@@ -5,7 +5,7 @@ package httpapi
 import (
 	"io/fs"
 
-	"github.com/shovan04/storvia/internal/httpapi/consoleout"
+	"github.com/shovan04/storvia-project/internal/httpapi/consoleout"
 )
 
 // The console ships inside the binary.

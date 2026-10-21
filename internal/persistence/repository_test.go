@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/shovan04/storvia/internal/config"
-	"github.com/shovan04/storvia/internal/storage/model"
+	"github.com/shovan04/storvia-project/internal/config"
+	"github.com/shovan04/storvia-project/internal/storage/model"
 )
 
 // newTestStore opens an isolated on-disk SQLite database per test.

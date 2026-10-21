@@ -11,7 +11,7 @@ import (
 	"context"
 	"io"
 
-	"github.com/shovan04/storvia/internal/storage/model"
+	"github.com/shovan04/storvia-project/internal/storage/model"
 )
 
 // Availability reports whether a provider is reachable for a given scope.

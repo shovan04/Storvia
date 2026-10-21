@@ -3,7 +3,7 @@ package httpapi
 import (
 	"net/http"
 
-	"github.com/shovan04/storvia/internal/storage/service"
+	"github.com/shovan04/storvia-project/internal/storage/service"
 )
 
 // ConsentHandler exposes the tenant's outage-fallback consent.

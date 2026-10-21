@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/shovan04/storvia/internal/storage/model"
+	"github.com/shovan04/storvia-project/internal/storage/model"
 )
 
 // Scope is the authenticated tenant/user pair every repository call requires.

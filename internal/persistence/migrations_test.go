@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/shovan04/storvia/internal/config"
+	"github.com/shovan04/storvia-project/internal/config"
 )
 
 // TestBackfillMigrationStampsPreviouslyDeletedObjects.

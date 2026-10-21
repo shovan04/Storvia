@@ -6,12 +6,12 @@ import (
 	"io"
 	"log/slog"
 
-	"github.com/shovan04/storvia/internal/apperr"
-	"github.com/shovan04/storvia/internal/persistence"
-	"github.com/shovan04/storvia/internal/storage/model"
-	"github.com/shovan04/storvia/internal/storage/policy"
-	"github.com/shovan04/storvia/internal/storage/provider/drive"
-	"github.com/shovan04/storvia/internal/storage/provider/s3compat"
+	"github.com/shovan04/storvia-project/internal/apperr"
+	"github.com/shovan04/storvia-project/internal/persistence"
+	"github.com/shovan04/storvia-project/internal/storage/model"
+	"github.com/shovan04/storvia-project/internal/storage/policy"
+	"github.com/shovan04/storvia-project/internal/storage/provider/drive"
+	"github.com/shovan04/storvia-project/internal/storage/provider/s3compat"
 )
 
 // contentSource resolves an object's recorded provider location.

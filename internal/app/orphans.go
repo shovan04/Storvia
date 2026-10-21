@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/shovan04/storvia/internal/persistence"
-	"github.com/shovan04/storvia/internal/storage/provider/s3compat"
+	"github.com/shovan04/storvia-project/internal/persistence"
+	"github.com/shovan04/storvia-project/internal/storage/provider/s3compat"
 )
 
 // orphanGrace is how long an object must have existed at a provider before it is

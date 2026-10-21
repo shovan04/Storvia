@@ -9,10 +9,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/shovan04/storvia/internal/metrics"
-	"github.com/shovan04/storvia/internal/persistence"
-	"github.com/shovan04/storvia/internal/storage/provider/s3compat"
-	"github.com/shovan04/storvia/internal/storage/service"
+	"github.com/shovan04/storvia-project/internal/metrics"
+	"github.com/shovan04/storvia-project/internal/persistence"
+	"github.com/shovan04/storvia-project/internal/storage/provider/s3compat"
+	"github.com/shovan04/storvia-project/internal/storage/service"
 )
 
 // WorkerConfig tunes the background worker.

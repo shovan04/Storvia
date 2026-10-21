@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/shovan04/storvia/internal/apperr"
-	"github.com/shovan04/storvia/internal/auth"
-	"github.com/shovan04/storvia/internal/logger"
-	"github.com/shovan04/storvia/internal/storage/service"
+	"github.com/shovan04/storvia-project/internal/apperr"
+	"github.com/shovan04/storvia-project/internal/auth"
+	"github.com/shovan04/storvia-project/internal/logger"
+	"github.com/shovan04/storvia-project/internal/storage/service"
 )
 
 // ConnectionHandler exposes the Drive connection lifecycle.

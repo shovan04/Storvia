@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/shovan04/storvia/internal/config"
-	"github.com/shovan04/storvia/internal/storage/provider/drive"
+	"github.com/shovan04/storvia-project/internal/config"
+	"github.com/shovan04/storvia-project/internal/storage/provider/drive"
 )
 
 // loadDevConfig loads the real development configuration with the developer's
